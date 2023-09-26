@@ -1,7 +1,23 @@
 ﻿@page "/"
+@inject NotificationService notificationService
 
 <PageTitle>Index</PageTitle>
 
 <h1>Pedro Vladimir Guzm&aacute;n Salazar (2021-0071)</h1>
 
 <h3>Programaci&oacute;n Aplicada 1 - 2023</h3>
+
+<button type="button" class="btn btn-primary" @onclick="MostrarNotificacion">Prueva</button>
+
+@code{
+
+    public void MostrarNotificacion(){
+        var mensaje = new NotificationMessage{
+            Severity = NotificationSeverity.Error,
+            Summary = "Notificacion",
+            Detail = "Este es un mensaaje de error!!",
+            Duration = 3_000
+        };
+        notificationService.Notify(mensaje);
+    }
+}
