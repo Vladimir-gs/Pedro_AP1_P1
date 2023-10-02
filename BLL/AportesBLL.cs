@@ -61,6 +61,7 @@ namespace Pedro_AP1_P1.BLL
 
             confirmar = _context.Aportes.Any(x => x.AportesId == aporte);
             return confirmar;
+            
         }
     }
 }
