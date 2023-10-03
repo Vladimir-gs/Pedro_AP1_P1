@@ -25,18 +25,18 @@
                 
                 @*FechaT*@
                 <div Class="form-group mb-3">
-                    <div>
-                        <label class="row-text"> Fecha </label>
-                    </div>                    
-                    <input type="date" @bind-value="aporte.Fecha" />
-                    <ValidationMessage For="@(() => aporte.Fecha)" />                    
+                    <label class="row-text"> Fecha </label>
+                    <div class="input-group">
+                        <input type="date" @bind-value="aporte.Fecha" />
+                        <ValidationMessage For="@(() => aporte.Fecha)" />
+                    </div>                               
                 </div>
 
                 @*Persona*@
                 <div class="mb-3">
                     <label class="form-group">Persona</label>
                     <div class="input-group">
-                        <InputText class="form-control"  @bind-Value="aporte.Persona" placeholder="Coloque una Descripcion" />
+                        <InputText class="form-control"  @bind-Value="aporte.Persona" placeholder="Coloque el nombre de la persona" />
                         <ValidationMessage For="@(() => aporte.Persona)" />
                     </div>
                 </div>
@@ -45,7 +45,7 @@
                 <div class="mb-3">
                     <label class="form-group">Observacion</label>
                     <div class="input-group">
-                        <InputText class="form-control"  @bind-Value="aporte.Observacion" placeholder="Coloque una Descripcion" />
+                        <InputText class="form-control"  @bind-Value="aporte.Observacion" placeholder="Coloque una observacion" />
                         <ValidationMessage For="@(() => aporte.Observacion)" />
                     </div>
                 </div>
@@ -87,13 +87,15 @@
     }
     public void Guardar(){
         if(Validar()){
+            NotificacionError("Validacion","Error, Verifique los campos");
             return;
         }
         var guardo = aportesBLL.Guardar(this.aporte);
         if(guardo){
+            NotificacionExito("Exito","Guardado Correctamente");
             Nuevo();
         }else{
-
+            NotificacionError("Error","Ocurrio un error y no fue posible Guardar");
         }
     }
 
@@ -101,12 +103,14 @@
         if(aporte.AportesId > 0){
             Buscar();
             if(aportesBLL.Eliminar(this.aporte)){
+                NotificacionExito("Exito","Eliminado Correctamente");
                 Nuevo();
             }
             else{
+                NotificacionError("Error","Ocurrio un error y no fue posible Eliminar");
             }  
         }else{
-
+            NotificacionError("Error","No se puede eliminar sin un ID Valido");
         }
     }
 
@@ -122,10 +126,33 @@
         var BuscarAporte = aportesBLL.Buscar(aporte.AportesId);
         if (BuscarAporte != null)
         {
+            NotificacionExito("Exito","Registro Encontrado");
             aporte = BuscarAporte;
         }
         else{
+        NotificacionError("Error de Busqueda","Registro no encontrado");
         }
     }
+
+    public void NotificacionError(string titulo, string detalle){
+        var mensaje = new NotificationMessage{
+            Severity = NotificationSeverity.Error,
+            Summary = titulo,
+            Detail = detalle,
+            Duration = 3_000
+        };
+        notificationService.Notify(mensaje);
+    }
+
+    public void NotificacionExito(string titulo, string detalle){
+        var mensaje = new NotificationMessage{
+            Severity = NotificationSeverity.Success,
+            Summary = titulo,
+            Detail = detalle,
+            Duration = 3_000
+        };
+        notificationService.Notify(mensaje);
+    }
+
 }
 
