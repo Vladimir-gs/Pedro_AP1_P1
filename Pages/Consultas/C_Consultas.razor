@@ -1,0 +1,120 @@
+@page "/ConsultasAportes"
+@inject AportesBLL aportesBLL
+
+<PageTitle>Consulta</PageTitle>
+
+<EditForm Model="Aportes">
+
+    <div class="card">
+
+        <div class="card-header">
+            <h3> Consulta de Aportes </h3>
+        </div>
+
+        <div class="card-body">
+            <form>
+                <div class="input-group d-flex align-items-end">
+
+                    <InputSelect class="form-control form-select col-2" @bind-Value="Filtro">
+                        <option selected>Elija el filto</option>
+                        <option value="1">Id</option>
+                        <option value="2">Persona</option>
+                    </InputSelect>
+
+                    <div class="flex-fill mx-2">
+
+                        <div class="input-group">
+                            <label class="input-group-text"> Busqueda </label>
+                            <InputText class="form-control" @bind-Value="Criterio" />
+                        </div>
+
+                    </div>
+
+                    <button type="button" class="btn btn-sm-10 btn-primary" @onclick="Buscar"> <span
+                            class="oi oi-magnifying-glass"></span> Buscar </button>
+                </div>
+            </form>
+
+        </div>
+
+
+        <table class="table table-bordered align-items-center">
+
+            <thead class="thead">
+                <tr class="table">
+
+                    <th>Id</th>
+                    <th>Fecha</th>
+                    <th>Persona</th>
+                    <th>Concepto</th>
+                    <th>Monto</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                @foreach (var item in Aportes)
+                {
+                    <tr>
+                        <td>@item.AportesId</td>
+                        <td>@item.Fecha</td>
+                        <td>@item.Persona</td>
+                        <td>@item.Observacion</td>
+                        <td>@item.Monto</td>
+                        <td><a class="btn btn-outline-primary" href="/RegistrosAportes/@item.AportesId">Ver</a></td>
+                    </tr>
+                }
+            </tbody>
+
+
+            <div class="card-footer">
+                <div class="d-flex flex-row">
+                    <div class="col">
+                        <label for="CantidaRegistro" class="col-form-label"><strong>Conteo</strong>&nbsp;</label>
+                        <input id="CantidaRegistro" @bind-value="@Conteo" disabled class="form-control" />
+                    </div>
+                    <div class="col">
+                        <label for="MontoTotal" class="col-form-label"><strong>Total</strong>&nbsp;</label>
+                        <input id="MontoTotal" @bind-value="@Total" disabled class="form-control" />
+                    </div>
+                </div>
+            </div>
+
+        </table>
+
+    </div>
+</EditForm>
+
+@code {
+
+    public string Filtro { get; set; }
+    public string Criterio { get; set; }
+    public int Conteo { get; set; } = 0;
+    public decimal Total { get; set; } = 0;
+    public List<Aportes> Aportes { get; set; } = new List<Aportes>();
+
+    protected override void OnInitialized()
+    {
+        Aportes = aportesBLL.GetList(p => true);
+        Conteo = Aportes.Count();
+        Total = Aportes.Sum(s => s.Monto);
+    }
+
+    private void Buscar()
+    {
+        if (Criterio != null)
+        {
+            switch (Filtro)
+            {
+                case "1":
+                    Aportes = aportesBLL.GetList(e => e.AportesId == int.Parse(Criterio));
+                    break;
+                case "2":
+                    Aportes = aportesBLL.GetList(e => e.Persona == Criterio);
+                    break;
+            }
+        }
+        else
+            Aportes = aportesBLL.GetList(p => true);
+        Conteo = Aportes.Count();
+    }
+}
