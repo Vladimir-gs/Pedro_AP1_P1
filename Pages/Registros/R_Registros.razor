@@ -1,0 +1,131 @@
+@page "/RegistrosAportes"
+@page "/RegistrosAportes/{AportesId:int}"
+@inject AportesBLL aportesBLL
+@inject NotificationService notificationService
+
+<PageTitle>RegistrosIngresos</PageTitle>
+
+<EditForm Model="aporte" OnInvalidSubmit="Guardar">
+    <DataAnnotationsValidator />
+
+    <div class="Container">
+        <div class="card shadow-lg">
+
+            <div class="card-header">
+                <h3>Registros de Aportes</h3>
+            </div>            
+
+            <div class="card-body">
+                @*AportesId*@
+                <div class="mb-3">
+                    <InputNumber class="col col-4" @bind-Value="aporte.AportesId" />
+                    <ValidationMessage For="@(() => aporte.AportesId)" />
+                    <button type="button" class="btn btn-sm btn-primary" @onclick="Buscar"> <i class="oi oi-magnifying-glass" /> </button>
+                </div>
+                
+                @*FechaT*@
+                <div Class="form-group mb-3">
+                    <div>
+                        <label class="row-text"> Fecha </label>
+                    </div>                    
+                    <input type="date" @bind-value="aporte.Fecha" />
+                    <ValidationMessage For="@(() => aporte.Fecha)" />                    
+                </div>
+
+                @*Persona*@
+                <div class="mb-3">
+                    <label class="form-group">Persona</label>
+                    <div class="input-group">
+                        <InputText class="form-control"  @bind-Value="aporte.Persona" placeholder="Coloque una Descripcion" />
+                        <ValidationMessage For="@(() => aporte.Persona)" />
+                    </div>
+                </div>
+
+                @*Observacion*@
+                <div class="mb-3">
+                    <label class="form-group">Observacion</label>
+                    <div class="input-group">
+                        <InputText class="form-control"  @bind-Value="aporte.Observacion" placeholder="Coloque una Descripcion" />
+                        <ValidationMessage For="@(() => aporte.Observacion)" />
+                    </div>
+                </div>
+
+                @*Monto*@
+                <div>
+                    <div>
+                        <label class="form-group">Monto</label>
+                    </div>
+                    <InputNumber class="col col-4" @bind-Value="aporte.Monto" min="1" />
+                    <ValidationMessage For="@(() => aporte.Monto)" />
+                </div>
+
+                @*Botones*@
+                <div class="card-footer d-flex justify-content-center mt-3">
+                    <div class="btn-group " role="group">
+                        <button type="button" class="btn btn-primary" @onclick="Nuevo"> <i class="oi oi-file" /> Nuevo </button>
+                        <button type="submit" class="btn btn-success" @onclick="Guardar"> <i class=" oi oi-document " /> Guardar </button>
+                        <button type="button" class="btn btn-danger" @onclick="Eliminar"> <i class="oi oi-trash" /> Eliminar  </button>
+                    </div>
+                </div>              
+            </div>
+        </div>
+    </div>
+
+</EditForm>
+
+@code{
+    [Parameter]
+    public int AportesId {get; set;}
+    public Aportes aporte {get; set;} = new Aportes();
+
+    protected override void OnInitialized(){
+        Nuevo();
+        if(AportesId > 0){
+            aporte.AportesId = AportesId;
+            Buscar();
+        }
+    }
+    public void Guardar(){
+        if(Validar()){
+            return;
+        }
+        var guardo = aportesBLL.Guardar(this.aporte);
+        if(guardo){
+            Nuevo();
+        }else{
+
+        }
+    }
+    
+    public void Eliminar(){
+        if(aporte.AportesId > 0){
+            Buscar();
+            if(aportesBLL.Eliminar(this.aporte)){
+                Nuevo();
+            }
+            else{
+            }  
+        }else{
+
+        }
+    }
+
+    public void Nuevo(){
+        this.aporte = new Aportes();
+    }
+
+    public bool Validar(){
+        return aportesBLL.Validar(aporte.AportesId);
+    }
+
+    public void Buscar(){
+        var BuscarAporte = aportesBLL.Buscar(aporte.AportesId);
+        if (BuscarAporte != null)
+        {
+            aporte = BuscarAporte;
+        }
+        else{
+        }
+    }
+}
+
